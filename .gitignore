@@ -1,0 +1,18 @@
+# R / RStudio
+.Rhistory
+.RData
+.Rproj.user/
+.Ruserdata
+
+# Quarto
+.quarto/
+*_files/
+
+# Clon del docente (tiene su propio .git)
+base/
+
+# Datos pesados (el Excel SI se versiona)
+data/*.csv
+
+# Temporales de Excel
+~$*.xlsx
