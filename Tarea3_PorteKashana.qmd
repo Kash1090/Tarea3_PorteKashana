@@ -20,15 +20,21 @@ cantones <- read.csv2("data/cantones.csv")
 df$fecha <- as.Date(df$fecha)
 ej1 <- alerta.movil(df, p$ventana, p$k.alerta)
 ej1.comun <- alerta.movil(df, 7, 2)
+cantones <- read.csv2("data/cantones.csv")
 
+parametros <- read.csv2("config/parametros_tarea3.csv")
+df <- read.csv2("data/transacciones_2025.csv")
+cantones <- read.csv("data/cantones.csv", fileEncoding = "UTF-8")
+
+
+ej2 <- benford.canton(df, p$canal.benford, cantones)
+mad.total <- benford.mad(df$monto_crc[df$canal == p$canal.benford])
+ej2.web <- benford.canton(df, "Web", cantones)
 ```
 
 \## 0 — Hoja de respuestas
 
-\`\`\`{r}
-#\| echo: false
-#\| comment: ""
-\`\`
+\`\`\`{r} #\| echo: false #\| comment: "" \`\`
 
 ```{r}
 #| echo: false
@@ -37,6 +43,11 @@ ej1.comun <- alerta.movil(df, 7, 2)
 cat("RESULTADO_1A =", sum(ej1$alerta), "\n")
 cat("RESULTADO_1B =", format(min(ej1$fecha[ej1$alerta])), "\n")
 cat("RESULTADO_1C =", sum(ej1.comun$alerta), "\n")
+
+cat("RESULTADO_2A =", sprintf("%.4f", mad.total), "\n")
+cat("RESULTADO_2B =", ej2$canton[1], "\n")
+cat("RESULTADO_2C =", sum(ej2$mad > 0.015), "\n")
+cat("RESULTADO_2D =", ej2.web$canton[1], "\n")
 ```
 
 \`
