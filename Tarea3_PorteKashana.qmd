@@ -20,6 +20,17 @@ cantones <- read.csv2("data/cantones.csv")
 df$fecha <- as.Date(df$fecha)
 ej1 <- alerta.movil(df, p$ventana, p$k.alerta)
 ej1.comun <- alerta.movil(df, 7, 2)
+cantones <- read.csv2("data/cantones.csv")
+
+parametros <- read.csv2("config/parametros_tarea3.csv")
+df <- read.csv2("data/transacciones_2025.csv")
+cantones <- read.csv("data/cantones.csv", fileEncoding = "UTF-8")
+
+
+ej2 <- benford.canton(df, p$canal.benford, cantones)
+mad.total <- benford.mad(df$monto_crc[df$canal == p$canal.benford])
+ej2.web <- benford.canton(df, "Web", cantones)
+
 
 ej3 <- valor.acumulado(df, p$tasa.anual, p$canal.interes)
 ej3.comun <- valor.acumulado(df, 0.06, "App")
@@ -32,10 +43,16 @@ ej3.comun <- valor.acumulado(df, 0.06, "App")
 ```{r}
 #| echo: false
 #| comment: ""
-
-cat("RESULTADO_1A =", sum(ej1$alerta), "\n")
-cat("RESULTADO_1B =", format(min(ej1$fecha[ej1$alerta])), "\n")
-cat("RESULTADO_1C =", sum(ej1.comun$alerta), "\n")
+cat("RESULTADO_1A = ", sum(ej1$alerta), "\n", sep = "")
+cat("RESULTADO_1B = ", format(min(ej1$fecha[ej1$alerta])), "\n", sep = "")
+cat("RESULTADO_1C = ", sum(ej1.comun$alerta), "\n", sep = "")
+cat("RESULTADO_2A = ", sprintf("%.4f", mad.total), "\n", sep = "")
+cat("RESULTADO_2B = ", ej2$canton[1], "\n", sep = "")
+cat("RESULTADO_2C = ", sum(ej2$mad > 0.015), "\n", sep = "")
+cat("RESULTADO_2D = ", ej2.web$canton[1], "\n", sep = "")
+cat("RESULTADO_3A = ", sprintf("%.2f", ej3$va), "\n", sep = "")
+cat("RESULTADO_3B = ", sprintf("%.2f", ej3$interes), "\n", sep = "")
+cat("RESULTADO_3C = ", sprintf("%.2f", ej3.comun$va), "\n", sep = "")
 ```
 
 \`
@@ -54,5 +71,48 @@ g1 <- ggplot(ej1, aes(fecha, n.tx)) +
 ggsave("info/figuras/ej1_alertas.png", g1, width = 8, height = 4.5, dpi = 150)
 g1
 
+
+```
+
+```{r}
+## Ejercicio 2
+
+
+#| echo: false
+x <- df$monto_crc[df$canal == p$canal.benford]
+x <- x[!is.na(x) & x > 0]
+d <- x %/% 10^floor(log10(x))
+g2d <- data.frame(digito = 1:9,
+                  p.d = tabulate(d, nbins = 9) / length(d),
+                  benford = log10(1 + 1 / (1:9)))
+g2 <- ggplot(g2d, aes(factor(digito))) +
+  geom_col(aes(y = p.d), fill = "steelblue") +
+  geom_line(aes(y = benford, group = 1), color = "red", linewidth = 1) +
+  geom_point(aes(y = benford), color = "red") +
+  labs(title = paste("Primer dígito vs Benford:", p$canal.benford),
+       x = "Primer dígito", y = "Proporción")
+ggsave("info/figuras/ej2_benford.png", g2, width = 8, height = 4.5, dpi = 150)
+g2
+
+**Conclusión.** No es fraude: los cantones con mayor MAD tienen pocas transacciones (n entre 151 y 299), y con muestras pequeñas la MAD sube por azar.
+```
+
+```{r}
+## Ejercicio 3
+
+
+#| echo: false
+t3 <- ej3$tabla
+g3d <- data.frame(
+  mes = factor(rep(t3$mes, 2)),
+  tipo = rep(c("Monto mensual", "Valor acumulado al 31-dic"), each = 12),
+  valor = c(t3$monto, t3$monto * t3$factor)
+)
+g3 <- ggplot(g3d, aes(mes, valor, fill = tipo)) +
+  geom_col(position = "dodge") +
+  labs(title = paste("Canal", p$canal.interes),
+       x = "Mes", y = "Colones", fill = NULL)
+ggsave("info/figuras/ej3_interes.png", g3, width = 8, height = 4.5, dpi = 150)
+g3
 
 ```
