@@ -1,16 +1,19 @@
 ---
 title: "Tarea 3 — Proyecto R + Git + Excel"
-format: html
-  embed-resources: true
+format: 
+  html:
+    embed-resources: true
 editor: visual
 ---
 
 ```{r}
-
-#| include: false
 library(ggplot2)
+#| include: false
+
 source("cod/funciones_tarea3.R")
 parametros <- read.csv2("config/parametros_tarea3.csv")
+
+
 p <- setNames(as.list(parametros$valor), parametros$parametro)
 p$ventana    <- as.numeric(p$ventana)
 p$k.alerta   <- as.numeric(p$k.alerta)
@@ -37,8 +40,6 @@ ej3.comun <- valor.acumulado(df, 0.06, "App")
 ```
 
 \## 0 — Hoja de respuestas
-
-\`\`\`{r} #\| echo: false #\| comment: "" \`\`
 
 ```{r}
 #| echo: false
@@ -94,7 +95,8 @@ g2 <- ggplot(g2d, aes(factor(digito))) +
 ggsave("info/figuras/ej2_benford.png", g2, width = 8, height = 4.5, dpi = 150)
 g2
 
-**Conclusión.** No es fraude: los cantones con mayor MAD tienen pocas transacciones (n entre 151 y 299), y con muestras pequeñas la MAD sube por azar.
+
+#**Conclusión.** No es fraude: los cantones con mayor MAD tienen pocas transacciones (n entre 151 y 299), y con muestras pequeñas la MAD sube por azar.
 ```
 
 ```{r}
