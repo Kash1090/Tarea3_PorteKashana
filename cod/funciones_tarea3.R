@@ -18,3 +18,53 @@ alerta.movil <- function(df, ventana, k.alerta) {
   d$alerta <- !is.na(d$media) & d$n.tx > d$media + k.alerta * d$desv
   d
 }
+
+# benford.mad
+# Recibe: x (vector numerico de montos)
+# Devuelve: la MAD respecto a la ley de Benford (numero)
+benford.mad <- function(x) {
+  x <- x[!is.na(x) & x > 0]
+  d <- x %/% 10^floor(log10(x))
+  p <- tabulate(d, nbins = 9) / length(d)
+  b <- log10(1 + 1 / (1:9))
+  mean(abs(p - b))
+}
+
+# benford.canton
+# Recibe: df (transacciones), canal (texto), cantones (data frame con cod_canton y canton)
+# Devuelve: data frame con cod_canton, canton, n, mad, clase; ordenado de mayor a menor MAD
+benford.canton <- function(df, canal, cantones) {
+  sub <- df[df$canal == canal, ]
+  partes <- split(sub$monto_crc, sub$cod_canton)
+  res <- data.frame(
+    cod_canton = names(partes),
+    n   = sapply(partes, length),
+    mad = sapply(partes, benford.mad),
+    row.names = NULL
+  )
+  res$clase <- as.character(cut(res$mad,
+                                breaks = c(-Inf, 0.006, 0.012, 0.015, Inf),
+                                labels = c("conformidad cercana", "conformidad aceptable",
+                                           "conformidad marginal", "no conformidad")))
+  cantones$cod_canton <- as.character(cantones$cod_canton)
+  res <- merge(res, cantones[, c("cod_canton", "canton")], by = "cod_canton")
+  res <- res[order(-res$mad), c("cod_canton", "canton", "n", "mad", "clase")]
+  rownames(res) <- NULL
+  res
+}
+
+# valor.acumulado
+# Recibe: df (transacciones), tasa.anual (efectiva anual, decimal), canal (texto)
+# Devuelve: lista con tabla (mes, monto, factor), tasa.mensual, va, interes
+valor.acumulado <- function(df, tasa.anual, canal) {
+  sub <- df[df$canal == canal, ]
+  mes <- as.integer(format(as.Date(sub$fecha), "%m"))
+  monto <- tapply(sub$monto_crc, factor(mes, levels = 1:12), sum)
+  monto[is.na(monto)] <- 0
+  tasa.mensual <- (1 + tasa.anual)^(1 / 12) - 1
+  tabla <- data.frame(mes = 1:12, monto = as.numeric(monto),
+                      factor = (1 + tasa.mensual)^(12 - (1:12)))
+  va <- sum(tabla$monto * tabla$factor)
+  list(tabla = tabla, tasa.mensual = tasa.mensual,
+       va = va, interes = va - sum(tabla$monto))
+} 
