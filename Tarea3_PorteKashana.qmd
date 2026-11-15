@@ -21,14 +21,13 @@ df$fecha <- as.Date(df$fecha)
 ej1 <- alerta.movil(df, p$ventana, p$k.alerta)
 ej1.comun <- alerta.movil(df, 7, 2)
 
+ej3 <- valor.acumulado(df, p$tasa.anual, p$canal.interes)
+ej3.comun <- valor.acumulado(df, 0.06, "App")
 ```
 
 \## 0 — Hoja de respuestas
 
-\`\`\`{r}
-#\| echo: false
-#\| comment: ""
-\`\`
+\`\`\`{r} #\| echo: false #\| comment: "" \`\`
 
 ```{r}
 #| echo: false
