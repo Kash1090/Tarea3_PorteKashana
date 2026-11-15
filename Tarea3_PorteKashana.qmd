@@ -18,6 +18,8 @@ p$tasa.anual <- as.numeric(p$tasa.anual)
 df <- read.csv2("data/transacciones_2025.csv")
 cantones <- read.csv2("data/cantones.csv")
 df$fecha <- as.Date(df$fecha)
+ej1 <- alerta.movil(df, p$ventana, p$k.alerta)
+ej1.comun <- alerta.movil(df, 7, 2)
 
 ```
 
@@ -26,4 +28,32 @@ df$fecha <- as.Date(df$fecha)
 \`\`\`{r}
 #\| echo: false
 #\| comment: ""
-\`\`\`
+\`\`
+
+```{r}
+#| echo: false
+#| comment: ""
+
+cat("RESULTADO_1A =", sum(ej1$alerta), "\n")
+cat("RESULTADO_1B =", format(min(ej1$fecha[ej1$alerta])), "\n")
+cat("RESULTADO_1C =", sum(ej1.comun$alerta), "\n")
+```
+
+\`
+
+```{r}
+
+## Ejercicio 1
+
+
+#| echo: false
+g1 <- ggplot(ej1, aes(fecha, n.tx)) +
+  geom_line(color = "grey40") +
+  geom_point(data = ej1[ej1$alerta, ], color = "red", size = 2) +
+  labs(title = "Transacciones diarias y días de alerta",
+       x = "Fecha", y = "Transacciones")
+ggsave("info/figuras/ej1_alertas.png", g1, width = 8, height = 4.5, dpi = 150)
+g1
+
+
+```
