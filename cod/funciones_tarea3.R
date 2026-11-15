@@ -51,6 +51,7 @@ benford.canton <- function(df, canal, cantones) {
   res <- res[order(-res$mad), c("cod_canton", "canton", "n", "mad", "clase")]
   rownames(res) <- NULL
   res
+<<<<<<< HEAD
 }
 
 # valor.acumulado
@@ -68,3 +69,6 @@ valor.acumulado <- function(df, tasa.anual, canal) {
   list(tabla = tabla, tasa.mensual = tasa.mensual,
        va = va, interes = va - sum(tabla$monto))
 } 
+=======
+}
+>>>>>>> feat/ej2-benford
