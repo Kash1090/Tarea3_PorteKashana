@@ -1,0 +1,29 @@
+---
+title: "Tarea 3 — Proyecto R + Git + Excel"
+format: html
+  embed-resources: true
+editor: visual
+---
+
+```{r}
+
+#| include: false
+library(ggplot2)
+source("cod/funciones_tarea3.R")
+parametros <- read.csv2("config/parametros_tarea3.csv")
+p <- setNames(as.list(parametros$valor), parametros$parametro)
+p$ventana    <- as.numeric(p$ventana)
+p$k.alerta   <- as.numeric(p$k.alerta)
+p$tasa.anual <- as.numeric(p$tasa.anual)
+df <- read.csv2("data/transacciones_2025.csv")
+cantones <- read.csv2("data/cantones.csv")
+df$fecha <- as.Date(df$fecha)
+
+```
+
+\## 0 — Hoja de respuestas
+
+\`\`\`{r}
+#\| echo: false
+#\| comment: ""
+\`\`\`
